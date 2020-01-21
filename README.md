@@ -24,7 +24,6 @@ You'd like your app to be listed in the **Send to...** section for certain types
 - [API](#api)
 - [License](#license)
 
-
 #### iOS
 
 On iOS, there are many ways apps can communicate. This plugin uses a [Share Extension](https://developer.apple.com/library/content/documentation/General/Conceptual/ExtensibilityPG/Share.html#//apple_ref/doc/uid/TP40014214-CH12-SW1). This is a particular type of App Extension which intent is, as Apple puts it: _"to post to a sharing website or share content with others"_.
@@ -48,8 +47,8 @@ cordova plugin add cordova-plugin-openwith-ios \
   --variable IOS_URL_SCHEME=cordovaopenwithdemo
 ```
 
-| variable | example | notes |
-|---|---|---|
+| variable         | example             | notes                                                                    |
+| ---------------- | ------------------- | ------------------------------------------------------------------------ |
 | `IOS_URL_SCHEME` | uniquelonglowercase | **iOS only** Any random long string of lowercase alphabetical characters |
 
 It shouldn't be too hard. But just in case, Jean-Christophe Hoelt [posted a screencast of it](https://youtu.be/eaE4m_xO1mg).
@@ -58,14 +57,14 @@ It shouldn't be too hard. But just in case, Jean-Christophe Hoelt [posted a scre
 
 After having installed the plugin, with the ios platform in place, 1 operation needs to be done manually: setup the App Group on both the Cordova App and the Share Extension.
 
- 1. open the **xcodeproject** for your application
- 1. select the root element of your **project navigator** (the left-side pane)
- 1. select the **target** of your application
- 1. select **capabilities**
- 1. scroll down to **App Groups**
- 1. make sure it's **ON**
- 1. create and activate an **App Group** called: `group.<YOUR_APP_BUNDLE_ID>.shareextension`
- 1. repeat the previous five steps for the **ShareExtension target**.
+1.  open the **xcodeproject** for your application
+1.  select the root element of your **project navigator** (the left-side pane)
+1.  select the **target** of your application
+1.  select **capabilities**
+1.  scroll down to **App Groups**
+1.  make sure it's **ON**
+1.  create and activate an **App Group** called: `group.<YOUR_APP_BUNDLE_ID>.shareextension`
+1.  repeat the previous five steps for the **ShareExtension target**.
 
 You might also have to select a Team for both the App and Share Extension targets, make sure to select the same.
 
@@ -74,36 +73,36 @@ Build, XCode might complain about a few things to setup that it will fix for you
 ## Usage
 
 ```js
-document.addEventListener('deviceready', setupOpenwith, false);
+document.addEventListener("deviceready", setupOpenwith, false);
 
 function setupOpenwith() {
-
   // Increase verbosity if you need more logs
   //cordova.openwith.setVerbosity(cordova.openwith.DEBUG);
 
   // Initialize the plugin
   cordova.openwith.init(initSuccess, initError);
-  
-  // Set logged in status
-  cordova.openwith.setLoggedIn(true);
 
-  function initSuccess()  { console.log('init success!'); }
-  function initError(err) { console.log('init failed: ' + err); }
+  function initSuccess() {
+    console.log("init success!");
+  }
+  function initError(err) {
+    console.log("init failed: " + err);
+  }
 
   // Define your file handler
   cordova.openwith.addHandler(myHandler);
 
   function myHandler(intent) {
-    console.log('intent received');
-    console.log('  text: ' + intent.text); // description to the sharing, for instance title of the page when shared URL from Safari
+    console.log("intent received");
+    console.log("  text: " + intent.text); // description to the sharing, for instance title of the page when shared URL from Safari
     for (var i = 0; i < intent.items.length; ++i) {
       var item = intent.items[i];
-      console.log('  type: ', item.uti);    // UTI. possible values: public.url, public.text or public.image
-      console.log('  type: ', item.type);   // Mime type. For example: "image/jpeg"
-      console.log('  data: ', item.data);   // shared data. For URLs and text - actually the shared URL or text. For image - its base64 string representation.
-      console.log('  text: ', item.text);   // text to share alongside the item. as we don't allow user to enter text in native UI, in most cases this will be empty. However for sharing pages from Safari this might contain the title of the shared page.
-      console.log('  name: ', item.name);   // suggested name of the image. For instance: "IMG_0404.JPG"
-      console.log('  utis: ', item.utis);   // some optional additional info
+      console.log("  type: ", item.uti); // UTI. possible values: public.url, public.text or public.image
+      console.log("  type: ", item.type); // Mime type. For example: "image/jpeg"
+      console.log("  data: ", item.data); // shared data. For URLs and text - actually the shared URL or text. For image - its base64 string representation.
+      console.log("  text: ", item.text); // text to share alongside the item. as we don't allow user to enter text in native UI, in most cases this will be empty. However for sharing pages from Safari this might contain the title of the shared page.
+      console.log("  name: ", item.name); // suggested name of the image. For instance: "IMG_0404.JPG"
+      console.log("  utis: ", item.utis); // some optional additional info
     }
     // ...
     // Here, you probably want to do something useful with the data
@@ -120,24 +119,10 @@ Change the verbosity level of the plugin.
 
 `level` can be set to:
 
- - `cordova.openwith.DEBUG` for maximal verbosity, log everything.
- - `cordova.openwith.INFO` for the default verbosity, log interesting stuff only.
- - `cordova.openwith.WARN` for low verbosity, log only warnings and errors.
- - `cordova.openwith.ERROR` for minimal verbosity, log only errors.
- 
-### cordova.openwith.setLoggedIn(status)
-
-Change logged in status of the app user. If your app requires the user to be logged in to share the items, you can make use of this by passing true or false values conditionally.
-Otherwise, just call this with true on the startup. The default value is false.
-If the user is not logged in, an alert window will be displayed instead of running the Cordova up. 
-
-For message localisation, open the project in XCode, select the ShareExtension in the navigation panel, and select **File -> New -> File -> (Resource) Strings file**, and name it **Localizable.strings**. Note that you should name it exactly "Localizable.strings", otherwise it wouldn't work. Then open your project settigns (root section in the file navigator on the left), select the Project and add languages on the info tab. Then, move back to your Localizable.strings and add its translations on the right sidebar. Generally the file contents should look like this:
-
-/* Sharing error alert title */
-"Sharing error"="< Your language translation >";
-
-/* Sharing error alert message */
-"You have to be logged in in order to share items."="< Your language translation >"; 
+- `cordova.openwith.DEBUG` for maximal verbosity, log everything.
+- `cordova.openwith.INFO` for the default verbosity, log interesting stuff only.
+- `cordova.openwith.WARN` for low verbosity, log only warnings and errors.
+- `cordova.openwith.ERROR` for minimal verbosity, log only errors.
 
 ### cordova.openwith.addHandler(handlerFunction)
 
@@ -151,22 +136,20 @@ The signature for the handler function is `function handlerFunction(intent)`. Se
 
 `intent` describe the operation to perform, toghether with the associated data. It has the following fields:
 
- - `text`: text to share alongside the item, in most cases this will be an empty string.
- - `items`: an array containing one or more data descriptor.
+- `text`: text to share alongside the item, in most cases this will be an empty string.
+- `items`: an array containing one or more data descriptor.
 
 **Data descriptor**
 
 A data descriptor describe one file. It is a javascript object with the following fields:
 
- - `uti`: Unique Type Identifier. possible values: public.url, public.text or public.image
- - `type`: Mime type. For example: "image/jpeg"
- - `text`: test description of the share, generally empty
- - `name`: suggested file name
- - `utis`: list of UTIs the file belongs to.
+- `uti`: Unique Type Identifier. possible values: public.url, public.text or public.image
+- `type`: Mime type. For example: "image/jpeg"
+- `text`: test description of the share, generally empty
+- `name`: suggested file name
+- `utis`: list of UTIs the file belongs to.
 
 ### cordova.openwith.load(dataDescriptor, loadSuccessCallback, loadErrorCallback)
-
-Load data for an item. For this modification, it is not necessary, 
 
 ### cordova.openwith.exit()
 
@@ -180,9 +163,10 @@ that he can now safely go back to what he was doing.
 ## Contribute
 
 Contributions in the form of GitHub pull requests are welcome. Please adhere to the following guidelines:
-  - Before embarking on a significant change, please create an issue to discuss the proposed change and ensure that it is likely to be merged.
-  - Follow the coding conventions used throughout the project. Many conventions are enforced using eslint and pmd. Run `npm t` to make sure of that.
-  - Any contributions must be licensed under the MIT license.
+
+- Before embarking on a significant change, please create an issue to discuss the proposed change and ensure that it is likely to be merged.
+- Follow the coding conventions used throughout the project. Many conventions are enforced using eslint and pmd. Run `npm t` to make sure of that.
+- Any contributions must be licensed under the MIT license.
 
 ## License
 

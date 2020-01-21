@@ -5,13 +5,13 @@ let expect = require('expect.js');
 describe('openwith', () => {
     let cordovaExecArgs;
 
-    let cordovaExecCallTo = function(method) {
+    let cordovaExecCallTo = function (method) {
         return cordovaExecArgs[method];
     };
 
     // cordova fail-over (to run tests)
     let fakeCordova = () => ({
-        exec: function(successCallback, errorCallback, targetObject, method, args) {
+        exec: function (successCallback, errorCallback, targetObject, method, args) {
             cordovaExecArgs[method] = {
                 successCallback: successCallback,
                 errorCallback: errorCallback,
@@ -30,7 +30,7 @@ describe('openwith', () => {
         openwith.setCordova(fakeCordova());
 
         // disable all logging
-        openwith.setLogger(() => {});
+        openwith.setLogger(() => { });
         // openwith.setVerbosity(0)
 
         cordovaExecArgs = {};
@@ -48,12 +48,12 @@ describe('openwith', () => {
             expect(openwith.init).withArgs(null, null).to.throwError();
         });
         it('accepts a success and error callback', () => {
-            let success = () => {};
-            let error = () => {};
+            let success = () => { };
+            let error = () => { };
             expect(openwith.init).withArgs(success, error).to.not.throwError();
         });
         it('rejects bad argument types', () => {
-            let cb = () => {};
+            let cb = () => { };
             expect(openwith.init).withArgs(cb, 1).to.throwError();
             expect(openwith.init).withArgs(1, cb).to.throwError();
         });
@@ -90,10 +90,6 @@ describe('openwith', () => {
         });
     });
 
-    describe('.setLoggedIn()', () => {
-        it('is a function', () => expect(openwith.setLoggedIn).to.be.a('function'));
-    });
-
     describe('.numHandlers', () => {
         it('is a function', () => expect(openwith.numHandlers).to.be.a('function'));
         it('returns the number of handlers', () => {
@@ -105,16 +101,16 @@ describe('openwith', () => {
     describe('.addHandler', () => {
         it('is a function', () => expect(openwith.addHandler).to.be.a('function'));
         it('accepts only a function as argument', () => {
-            expect(openwith.addHandler).withArgs(() => {}).to.not.throwError();
+            expect(openwith.addHandler).withArgs(() => { }).to.not.throwError();
             expect(openwith.addHandler).withArgs('nope').to.throwError();
         });
         it('increases the number of handlers', () => {
             expect(openwith.numHandlers()).to.equal(0);
-            openwith.addHandler(() => {});
+            openwith.addHandler(() => { });
             expect(openwith.numHandlers()).to.equal(1);
         });
         it('refuses to add the same handler more than once', () => {
-            const handler = () => {};
+            const handler = () => { };
             expect(openwith.numHandlers()).to.equal(0);
             openwith.addHandler(handler);
             expect(openwith.numHandlers()).to.equal(1);
@@ -138,10 +134,10 @@ describe('openwith', () => {
             // setup 2 handlers
             myHandlersArgs = [undefined, undefined];
             myHandlers = [
-                function() {
+                function () {
                     myHandlersArgs[0] = arguments;
                 },
-                function() {
+                function () {
                     myHandlersArgs[1] = arguments;
                 },
             ];
@@ -155,7 +151,7 @@ describe('openwith', () => {
             });
 
             // trigger a new file event and check that the handlers have been called
-            let newFile = {test: 1};
+            let newFile = { test: 1 };
             onNewFile(newFile);
             myHandlersArgs.forEach((args) => {
                 expect(args).to.be.ok();
@@ -163,7 +159,7 @@ describe('openwith', () => {
             });
 
             // do it again with another pseudo "file"
-            let newFile2 = {test: 2};
+            let newFile2 = { test: 2 };
             onNewFile(newFile2);
             myHandlersArgs.forEach((args) => {
                 expect(args[0]).to.equal(newFile2);
@@ -171,7 +167,7 @@ describe('openwith', () => {
         });
 
         it('triggers for handlers added after the new file is received', () => {
-            let newFile = {test: 3};
+            let newFile = { test: 3 };
             onNewFile(newFile);
             myHandlers.forEach(openwith.addHandler);
             myHandlersArgs.forEach((args) => {
