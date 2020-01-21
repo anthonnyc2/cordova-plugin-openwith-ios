@@ -113,7 +113,7 @@ function getCordovaParameter(configXml, variableName) {
 // }
 
 function parsePbxProject(context, pbxProjectPath) {
-  var xcode = context.requireCordovaModule('xcode');
+  var xcode = require('xcode');
   console.log('    Parsing existing project at location: ' + pbxProjectPath + '...');
   var pbxProject;
   if (context.opts.cordova.project) {
@@ -202,8 +202,7 @@ console.log('Adding target "' + PLUGIN_ID + '/ShareExtension" to XCode project')
 
 module.exports = function (context) {
 
-  var Q = context.requireCordovaModule('q');
-  var deferral = new Q.defer();
+  var deferral = require('q').defer();
 
   // if (context.opts.cordova.platforms.indexOf('ios') < 0) {
   //   log('You have to add the ios platform before adding this plugin!', 'error');
