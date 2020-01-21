@@ -133,30 +133,42 @@
         if([responder respondsToSelector:selector] == true) {
             NSMethodSignature *methodSignature = [responder methodSignatureForSelector:selector];
             NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:methodSignature];
-
-            // Arguments
-            NSDictionary<NSString *, id> *options = [NSDictionary dictionary];
             void (^completion)(BOOL success) = ^void(BOOL success) {
                 NSLog(@"Completions block: %i", success);
             };
-
-            [invocation setTarget: responder];
-            [invocation setSelector: selector];
-            [invocation setArgument: &url atIndex: 2];
-            [invocation setArgument: &options atIndex:3];
-            [invocation setArgument: &completion atIndex: 4];
-            [invocation invoke];
-            break;
+            
+            // Arguments
+            if (@available(iOS 13.0, *)) {
+                UISceneOpenExternalURLOptions * options = [[UISceneOpenExternalURLOptions alloc] init];
+                options.universalLinksOnly = false;
+                
+                [invocation setTarget: responder];
+                [invocation setSelector: selector];
+                [invocation setArgument: &url atIndex: 2];
+                [invocation setArgument: &options atIndex:3];
+                [invocation setArgument: &completion atIndex: 4];
+                [invocation invoke];
+                break;
+            } else {
+                NSDictionary<NSString *, id> *options = [NSDictionary dictionary];
+                [invocation setTarget: responder];
+                [invocation setSelector: selector];
+                [invocation setArgument: &url atIndex: 2];
+                [invocation setArgument: &options atIndex:3];
+                [invocation setArgument: &completion atIndex: 4];
+                [invocation invoke];
+                break;
+            }
         }
     }
 }
 - (void) viewDidAppear:(BOOL)animated {
     [self.view endEditing:YES];
-}
+// }
 
-- (void) viewDidLoad {
+//- (void) viewDidLoad {
     [self setup];
-    [self debug:@"[viewDidLoad]"];
+    [self debug:@"[viewDidAppear]"];
 
     __block int remainingAttachments = ((NSExtensionItem*)self.extensionContext.inputItems[0]).attachments.count;
     __block NSMutableArray *items = [[NSMutableArray alloc] init];
@@ -217,7 +229,7 @@
                 NSData *data = [NSData dataWithContentsOfURL:(NSURL*)item];
                 NSString *base64 = [data convertToBase64];
                 NSString *suggestedName = item.lastPathComponent;
-
+                
                 NSString *uti = @"public.image";
 
                 NSString *registeredType = nil;
@@ -235,7 +247,7 @@
                                            @"uti"  : uti,
                                            @"utis" : itemProvider.registeredTypeIdentifiers,
                                            @"name" : suggestedName,
-                                           @"type" : mimeType
+                                           @"type" : mimeType,
                                       };
 
                 [items addObject:dict];
@@ -316,7 +328,7 @@
     // Wallet - com.apple.Passbook
     // Watch - com.apple.Bridge
     // Weather - com.apple.weather
-    return nil;
+    return @"";
 }
 
 // This is called at the point where the Post dialog is about to be shown.
