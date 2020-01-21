@@ -29,34 +29,34 @@
 // THE SOFTWARE.
 //
 
-const PLUGIN_ID = 'com.web-mystery.cordova.openwith-ios';
+const PLUGIN_ID = 'cordova-plugin.openwith-ios';
 const BUNDLE_SUFFIX = '.shareextension';
 
 var fs = require('fs');
 var path = require('path');
 
 function redError(message) {
-    return new Error('"' + PLUGIN_ID + '" \x1b[1m\x1b[31m' + message + '\x1b[0m');
+  return new Error('"' + PLUGIN_ID + '" \x1b[1m\x1b[31m' + message + '\x1b[0m');
 }
 
 function replacePreferencesInFile(filePath, preferences) {
-    var content = fs.readFileSync(filePath, 'utf8');
-    for (var i = 0; i < preferences.length; i++) {
-        var pref = preferences[i];
-        var regexp = new RegExp(pref.key, "g");
-        content = content.replace(regexp, pref.value);
-    }
-    fs.writeFileSync(filePath, content);
+  var content = fs.readFileSync(filePath, 'utf8');
+  for (var i = 0; i < preferences.length; i++) {
+    var pref = preferences[i];
+    var regexp = new RegExp(pref.key, "g");
+    content = content.replace(regexp, pref.value);
+  }
+  fs.writeFileSync(filePath, content);
 }
 
 // Determine the full path to the app's xcode project file.
 function findXCodeproject(context, callback) {
-  fs.readdir(iosFolder(context), function(err, data) {
+  fs.readdir(iosFolder(context), function (err, data) {
     var projectFolder;
     var projectName;
     // Find the project folder by looking for *.xcodeproj
     if (data && data.length) {
-      data.forEach(function(folder) {
+      data.forEach(function (folder) {
         if (folder.match(/\.xcodeproj$/)) {
           projectFolder = path.join(iosFolder(context), folder);
           projectName = path.basename(folder, '.xcodeproj');
@@ -94,7 +94,7 @@ function getPreferenceValue(configXml, name) {
 
 function getCordovaParameter(configXml, variableName) {
   var variable;
-  var arg = process.argv.filter(function(arg) {
+  var arg = process.argv.filter(function (arg) {
     return arg.indexOf(variableName + '=') == 0;
   });
   if (arg.length >= 1) {
@@ -127,13 +127,13 @@ function parsePbxProject(context, pbxProjectPath) {
 
 function forEachShareExtensionFile(context, callback) {
   var shareExtensionFolder = path.join(iosFolder(context), 'ShareExtension');
-  fs.readdirSync(shareExtensionFolder).forEach(function(name) {
+  fs.readdirSync(shareExtensionFolder).forEach(function (name) {
     // Ignore junk files like .DS_Store
     if (!/^\..*/.test(name)) {
       callback({
-        name:name,
-        path:path.join(shareExtensionFolder, name),
-        extension:path.extname(name)
+        name: name,
+        path: path.join(shareExtensionFolder, name),
+        extension: path.extname(name)
       });
     }
   });
@@ -171,9 +171,9 @@ function getPreferences(context, configXml, projectName) {
 
 // Return the list of files in the share extension project, organized by type
 function getShareExtensionFiles(context) {
-  var files = {source:[],plist:[],resource:[]};
-  var FILE_TYPES = { '.h':'source', '.m':'source', '.plist':'plist' };
-  forEachShareExtensionFile(context, function(file) {
+  var files = { source: [], plist: [], resource: [] };
+  var FILE_TYPES = { '.h': 'source', '.m': 'source', '.plist': 'plist' };
+  forEachShareExtensionFile(context, function (file) {
     var fileType = FILE_TYPES[file.extension] || 'resource';
     files[fileType].push(file);
   });
@@ -183,17 +183,17 @@ function getShareExtensionFiles(context) {
 function printShareExtensionFiles(files) {
   console.log('    Found following files in your ShareExtension folder:');
   console.log('    Source files:');
-  files.source.forEach(function(file) {
+  files.source.forEach(function (file) {
     console.log('     - ', file.name);
   });
 
   console.log('    Plist files:');
-  files.plist.forEach(function(file) {
+  files.plist.forEach(function (file) {
     console.log('     - ', file.name);
   });
 
   console.log('    Resource files:');
-  files.resource.forEach(function(file) {
+  files.resource.forEach(function (file) {
     console.log('     - ', file.name);
   });
 }
@@ -214,7 +214,7 @@ module.exports = function (context) {
     configXml = configXml.substring(configXml.indexOf('<'));
   }
 
-  findXCodeproject(context, function(projectFolder, projectName) {
+  findXCodeproject(context, function (projectFolder, projectName) {
 
     console.log('  - Folder containing your iOS project: ' + iosFolder(context));
 
@@ -225,7 +225,7 @@ module.exports = function (context) {
     // printShareExtensionFiles(files);
 
     var preferences = getPreferences(context, configXml, projectName);
-    files.plist.concat(files.source).forEach(function(file) {
+    files.plist.concat(files.source).forEach(function (file) {
       replacePreferencesInFile(file.path, preferences);
       // console.log('    Successfully updated ' + file.name);
     });
@@ -239,7 +239,7 @@ module.exports = function (context) {
     if (!target) {
       // Add PBXNativeTarget to the project
       target = pbxProject.addTarget('ShareExt', 'app_extension', 'ShareExtension');
-      
+
       // Add a new PBXSourcesBuildPhase for our ShareViewController
       // (we can't add it to the existing one because an extension is kind of an extra app)
       pbxProject.addBuildPhase([], 'PBXSourcesBuildPhase', 'Sources', target.uuid);
@@ -250,7 +250,7 @@ module.exports = function (context) {
     }
 
     // Create a separate PBXGroup for the shareExtensions files, name has to be unique and path must be in quotation marks
-    var pbxGroupKey = pbxProject.findPBXGroupKey({name: 'ShareExtension'});
+    var pbxGroupKey = pbxProject.findPBXGroupKey({ name: 'ShareExtension' });
     if (pbxProject) {
       console.log('    ShareExtension group already exists.');
     }
@@ -258,7 +258,7 @@ module.exports = function (context) {
       pbxGroupKey = pbxProject.pbxCreateGroup('ShareExtension', 'ShareExtension');
 
       // Add the PbxGroup to cordovas "CustomTemplate"-group
-      var customTemplateKey = pbxProject.findPBXGroupKey({name: 'CustomTemplate'});
+      var customTemplateKey = pbxProject.findPBXGroupKey({ name: 'CustomTemplate' });
       pbxProject.addToPbxGroup(pbxGroupKey, customTemplateKey);
     }
 
@@ -268,13 +268,13 @@ module.exports = function (context) {
     });
 
     // Add source files to our PbxGroup and our newly created PBXSourcesBuildPhase
-    files.source.forEach(function(file) {
-      pbxProject.addSourceFile(file.name, {target: target.uuid}, pbxGroupKey);
+    files.source.forEach(function (file) {
+      pbxProject.addSourceFile(file.name, { target: target.uuid }, pbxGroupKey);
     });
 
     //  Add the resource file and include it into the targest PbxResourcesBuildPhase and PbxGroup
-    files.resource.forEach(function(file) {
-      pbxProject.addResourceFile(file.name, {target: target.uuid}, pbxGroupKey);
+    files.resource.forEach(function (file) {
+      pbxProject.addResourceFile(file.name, { target: target.uuid }, pbxGroupKey);
     });
 
     // Add a new PBXFrameworksBuildPhase for the Frameworks used by the Share Extension

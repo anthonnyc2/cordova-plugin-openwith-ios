@@ -31,15 +31,15 @@
 
 var fs = require('fs');
 var path = require('path');
-const PLUGIN_ID = "com.web-mystery.cordova.openwith-ios";
+const PLUGIN_ID = "cordova-plugin.openwith-ios";
 
 function redError(message) {
-    return new Error('"' + PLUGIN_ID + '" \x1b[1m\x1b[31m' + message + '\x1b[0m');
+  return new Error('"' + PLUGIN_ID + '" \x1b[1m\x1b[31m' + message + '\x1b[0m');
 }
 
-function getPreferenceValue (config, name) {
+function getPreferenceValue(config, name) {
   var value = config.match(new RegExp('name="' + name + '" value="(.*?)"', "i"));
-  if(value && value[1]) {
+  if (value && value[1]) {
     return value[1];
   } else {
     return null;
@@ -74,7 +74,7 @@ function copyFolderRecursiveSync(source, target) {
   // Copy
   if (fs.lstatSync(source).isDirectory()) {
     files = fs.readdirSync(source);
-    files.forEach(function(file) {
+    files.forEach(function (file) {
       var curSource = path.join(source, file);
       if (fs.lstatSync(curSource).isDirectory()) {
         copyFolderRecursiveSync(curSource, targetFolder);
@@ -90,12 +90,12 @@ function findXCodeproject(context, callback) {
   var iosFolder = context.opts.cordova.project
     ? context.opts.cordova.project.root
     : path.join(context.opts.projectRoot, 'platforms/ios/');
-  fs.readdir(iosFolder, function(err, data) {
+  fs.readdir(iosFolder, function (err, data) {
     var projectFolder;
     var projectName;
     // Find the project folder by looking for *.xcodeproj
     if (data && data.length) {
-      data.forEach(function(folder) {
+      data.forEach(function (folder) {
         if (folder.match(/\.xcodeproj$/)) {
           projectFolder = path.join(iosFolder, folder);
           projectName = path.basename(folder, '.xcodeproj');
@@ -115,11 +115,11 @@ function findXCodeproject(context, callback) {
   });
 }
 
-module.exports = function(context) {
+module.exports = function (context) {
   var Q = context.requireCordovaModule('q');
   var deferral = new Q.defer();
 
-  findXCodeproject(context, function(projectFolder, projectName) {
+  findXCodeproject(context, function (projectFolder, projectName) {
 
     var srcFolder = path.join(context.opts.projectRoot, 'plugins', PLUGIN_ID, 'src', 'ios', 'ShareExtension');
     if (!fs.existsSync(srcFolder)) {
